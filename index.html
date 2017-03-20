@@ -4,28 +4,55 @@
     <meta charset="utf-8">
     <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.min.js"></script>
   </head>
-  <body>
-    <div ng-app="demoApp" ng-controller="mainController">
-       <say-hello message="Hi"></say-hello>
+  <body ng-app="demoApp" ng-controller="mainController">
+    <div ng-repeat="user in users">
+      <say-hello message="Hi"></say-hello>
     </div>
 
-    <script>
-    var demoApp = angular.module("demoApp", []);
+    <form ng-submit="addUser()" >
+      <input type="text" ng-model="newUser.firstName" placeholder="Give me a first name...">
+      <input type="text" ng-model="newUser.lastName" placeholder="Give me a last name...">
+      <button type="submit">ADD</button>
+    </form>
 
-    demoApp.controller("mainController", function($scope) {
-      $scope.firstName = "Thomas";
-      $scope.lastName = "Ochman";
-    });
+
+
+  <script>
+      var demoApp = angular.module("demoApp", []);
+      demoApp.controller("mainController", function($scope, userService) {
+          $scope.users = userService.users();
+          $scope.newUser = {};
+          $scope.addUser = function(){
+            userService.add($scope.newUser);
+            $scope.newUser = {};
+          }
+          });
+
+          demoApp.service('userService', function(){
+           var collection = [
+             {firstName: 'Thomas', lastName: 'Ochman'},
+             {firstName: 'Amber', lastName: 'Wilkie'},
+             {firstName: 'Raoul', lastName: 'Diffouo'}
+           ];
+           return {
+             users: function(){
+               return collection;
+             },
+             add: function(object){
+               collection.push(object);
+             }
+           }
+        });
 
     demoApp.directive("sayHello", function() {
-        return {
-          scope: false,
-          link: function($scope, element, attrs){
-            $scope.message = attrs.message;
-          },
-          template: "<h1> {{[message, firstName, lastName].join(' ')}}!</h1>"
-        };
-      });
+          return {
+            scope: false,
+            link: function($scope, element, attrs){
+              $scope.message = attrs.message;
+            },
+            template: "<h1> {{[message, user.firstName, user.lastName].join(' ')}}!</h1>"
+          };
+        });
     </script>
 
   </body>
